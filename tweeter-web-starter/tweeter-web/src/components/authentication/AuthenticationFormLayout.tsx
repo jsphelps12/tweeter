@@ -1,4 +1,4 @@
-import OAuthenticationButtons from "./OAuth";
+import OAuth from "./OAuth";
 import { useMessageActions } from "../toaster/MessageHooks";
 
 interface Props {
@@ -42,7 +42,7 @@ const AuthenticationFormLayout = (props: Props) => {
           <h1 className="h4 mb-3 fw-normal">Or</h1>
           <h1 className="h5 mb-3 fw-normal">{props.oAuthHeading}</h1>
 
-          <OAuthenticationButtons />
+          <OAuth />
 
           <div className="checkbox mb-3">
             <label>
