@@ -2,9 +2,9 @@ import { AuthToken, FakeData, Status, User } from "tweeter-shared";
 import { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useParams } from "react-router-dom";
-import StatusItem from "../statusItem/statusItem";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
+import StatusItem from "../statusItem/StatusItem";
 
 export const PAGE_SIZE = 10;
 
