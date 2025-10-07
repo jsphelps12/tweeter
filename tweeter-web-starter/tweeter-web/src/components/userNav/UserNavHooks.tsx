@@ -32,15 +32,15 @@ export const useUserNavigation = (featurePath: string) => {
   return navigateToUser;
 }
 
-  const extractAlias = (value: string): string => {
-    const index = value.indexOf("@");
-    return value.substring(index);
-  };
+const extractAlias = (value: string): string => {
+  const index = value.indexOf("@");
+  return value.substring(index);
+};
 
-  const getUser = async (
-    authToken: AuthToken,
-    alias: string
-  ): Promise<User | null> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
-  };
+const getUser = async (
+  authToken: AuthToken,
+  alias: string
+): Promise<User | null> => {
+  // TODO: Replace with the result of calling server
+  return FakeData.instance.findUserByAlias(alias);
+};
