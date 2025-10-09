@@ -30,10 +30,10 @@ export class UserNavHooksPresenter {
         return value.substring(index);
     };
 
-    public async navigateToUser (event: React.MouseEvent, authToken: AuthToken, displayedUser: User, featurePath: string): Promise<void> {
+    public async navigateToUser (event: string, authToken: AuthToken, displayedUser: User, featurePath: string): Promise<void> {
 
         try {
-        const alias = this.extractAlias(event.target.toString());
+        const alias = this.extractAlias(event);
 
         const toUser = await this.getUser(authToken, alias);
 
