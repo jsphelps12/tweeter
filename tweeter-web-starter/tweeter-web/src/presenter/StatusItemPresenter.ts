@@ -47,7 +47,7 @@ export abstract class StatusItemPresenter{
         authToken: AuthToken,
         alias: string
       ): Promise<any>{
-        return this.userService.getUser(authToken, alias);
+        return await this.userService.getUser(authToken, alias);
     }
 
     public abstract loadMoreItems(authToken: AuthToken, userAlias: string): void;
