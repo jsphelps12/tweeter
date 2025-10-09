@@ -1,8 +1,9 @@
 import "./PostStatus.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AuthToken, Status } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo } from "../userInfo/UserInfoHooks";
+import { PostStatusPresenter, PostStatusView } from "../../presenter/PostStatusPresenter";
 
 const PostStatus = () => {
   const { displayInfoMessage, displayErrorMessage, deleteMessage } = useMessageActions();
@@ -11,52 +12,67 @@ const PostStatus = () => {
   const [post, setPost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const listener: PostStatusView = {
+      setIsLoading: setIsLoading,
+      setPost: setPost,
+      displayInfoMessage: displayInfoMessage,
+      deleteMessage: deleteMessage,
+      displayErrorMessage: displayErrorMessage
+    }
+  
+  const presenterRef = useRef<PostStatusPresenter | null>(null);
+      if (presenterRef.current === null) {
+        presenterRef.current = new PostStatusPresenter(listener);
+      }
+
   const submitPost = async (event: React.MouseEvent) => {
     event.preventDefault();
 
-    var postingStatusToastId = "";
+    presenterRef.current!.submitPost(post, currentUser!, authToken!);
 
-    try {
-      setIsLoading(true);
-      postingStatusToastId = displayInfoMessage(
-        "Posting status...",
-        0
-      );
+    // var postingStatusToastId = "";
 
-      const status = new Status(post, currentUser!, Date.now());
+    // try {
+    //   setIsLoading(true);
+    //   postingStatusToastId = displayInfoMessage(
+    //     "Posting status...",
+    //     0
+    //   );
 
-      await postStatus(authToken!, status);
+    //   const status = new Status(post, currentUser!, Date.now());
 
-      setPost("");
-      displayInfoMessage("Status posted!", 2000);
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to post the status because of exception: ${error}`
-      );
-    } finally {
-      deleteMessage(postingStatusToastId);
-      setIsLoading(false);
-    }
+    //   await postStatus(authToken!, status);
+
+    //   setPost("");
+    //   displayInfoMessage("Status posted!", 2000);
+    // } catch (error) {
+    //   displayErrorMessage(
+    //     `Failed to post the status because of exception: ${error}`
+    //   );
+    // } finally {
+    //   deleteMessage(postingStatusToastId);
+    //   setIsLoading(false);
+    // }
   };
 
-  const postStatus = async (
-    authToken: AuthToken,
-    newStatus: Status
-  ): Promise<void> => {
-    // Pause so we can see the logging out message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
+  // const postStatus = async (
+  //   authToken: AuthToken,
+  //   newStatus: Status
+  // ): Promise<void> => {
+  //   // Pause so we can see the logging out message. Remove when connected to the server
+  //   await new Promise((f) => setTimeout(f, 2000));
 
-    // TODO: Call the server to post the status
-  };
+  //   // TODO: Call the server to post the status
+  // };
 
   const clearPost = (event: React.MouseEvent) => {
     event.preventDefault();
     setPost("");
   };
 
-  const checkButtonStatus: () => boolean = () => {
-    return !post.trim() || !authToken || !currentUser;
-  };
+  // const checkButtonStatus: () => boolean = () => {
+  //   return !post.trim() || !authToken || !currentUser;
+  // };
 
   return (
     <form>
@@ -77,7 +93,8 @@ const PostStatus = () => {
           id="postStatusButton"
           className="btn btn-md btn-primary me-1"
           type="button"
-          disabled={checkButtonStatus()}
+          // disabled={checkButtonStatus()}
+          disabled = {presenterRef.current!.checkButtonStatus(post, authToken!, currentUser!)}
           style={{ width: "8em" }}
           onClick={submitPost}
         >
@@ -95,7 +112,7 @@ const PostStatus = () => {
           id="clearStatusButton"
           className="btn btn-md btn-secondary"
           type="button"
-          disabled={checkButtonStatus()}
+          disabled={presenterRef.current!.checkButtonStatus(post, authToken!, currentUser!)}
           onClick={clearPost}
         >
           Clear
