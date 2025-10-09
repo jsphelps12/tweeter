@@ -16,10 +16,10 @@ export const useUserNavigation = (featurePath: string) => {
       navigate: navigate
     }
   
-    const presenterRef = useRef<UserNavHooksPresenter | null>(null);
-        if (presenterRef.current === null) {
-          presenterRef.current = new UserNavHooksPresenter(listener);
-        }
+  const presenterRef = useRef<UserNavHooksPresenter | null>(null);
+      if (presenterRef.current === null) {
+        presenterRef.current = new UserNavHooksPresenter(listener);
+      }
 
   const navigateToUser = async (event: React.MouseEvent): Promise<void> => {
     event.preventDefault();
