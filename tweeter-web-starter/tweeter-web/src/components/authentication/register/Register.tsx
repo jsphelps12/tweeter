@@ -98,9 +98,10 @@ const Register = () => {
   // };
 
   const doRegister = async () => {
-    presenterRef.current!.doRegister(firstName, lastName, alias, password, imageBytes, imageFileExtension, rememberMe);
+    // presenterRef.current!.doRegister(firstName, lastName, alias, password, imageBytes, imageFileExtension, rememberMe);
     // try {
-    //   setIsLoading(true);
+      setIsLoading(true);
+      presenterRef.current!.doRegister(firstName, lastName, alias, password, imageBytes, imageFileExtension, rememberMe);
 
     //   const [user, authToken] = await register(
     //     firstName,
@@ -118,7 +119,7 @@ const Register = () => {
     //     `Failed to register user because of exception: ${error}`
     //   );
     // } finally {
-    //   setIsLoading(false);
+      setIsLoading(false);
     // }
   };
 

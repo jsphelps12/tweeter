@@ -2,10 +2,10 @@ import { User, AuthToken } from "tweeter-shared";
 import { UserService } from "../model.service/UserService";
 import { NavigateFunction } from "react-router-dom";
 import { Buffer } from "buffer";
+import { Presenter, View } from "./Presenter";
 
 
-export interface RegisterView {
-    displayErrorMessage: (message: string) => void;
+export interface RegisterView extends View{
     navigate: NavigateFunction;
     setIsLoading: (isLoading: boolean) => void;
     setImageUrl: (imageUrl: string) => void;
@@ -14,18 +14,13 @@ export interface RegisterView {
     updateUserInfo: (loggedInUser: User, displayedUser: User, authToken: AuthToken, rememberMe: boolean) => void;
   }
 
-export class RegisterPresenter {
+export class RegisterPresenter extends Presenter<RegisterView> {
     // Implementation not shown as it's not part of the comparison
     private userService: UserService;
-    private _view: RegisterView;
     
     constructor(view: RegisterView) {
+        super(view);
         this.userService = new UserService();
-        this._view = view;
-    }
-
-    public get view() {
-        return this._view;
     }
 
     public checkSubmitButtonStatus (firstName: string, lastName: string, alias: string, password: string, imageUrl: string, imageFileExtension: string): boolean {
@@ -40,39 +35,52 @@ export class RegisterPresenter {
     };
 
     public async doRegister (firstName: string, lastName: string, alias: string, password: string, imageBytes: Uint8Array, imageFileExtension: string, rememberMe: boolean) {
-        try {
-        this.view.setIsLoading(true);
+        this.doFailureReportingOperation(async () => {
+            const [user, authToken] = await this.userService.register(
+                firstName,
+                lastName,
+                alias,
+                password,
+                imageBytes,
+                imageFileExtension
+            );
 
-        const [user, authToken] = await this.register(
-            firstName,
-            lastName,
-            alias,
-            password,
-            imageBytes,
-            imageFileExtension
-        );
+            this.view.updateUserInfo(user, user, authToken, rememberMe);
+            this.view.navigate(`/feed/${user.alias}`);
+        }, "register user");
+        // try {
+        // // this.view.setIsLoading(true);
 
-        this.view.updateUserInfo(user, user, authToken, rememberMe);
-        this.view.navigate(`/feed/${user.alias}`);
-        } catch (error) {
-        this.view.displayErrorMessage(
-            `Failed to register user because of exception: ${error}`
-        );
-        } finally {
-        this.view.setIsLoading(false);
-        }
+        // const [user, authToken] = await this.userService.register(
+        //     firstName,
+        //     lastName,
+        //     alias,
+        //     password,
+        //     imageBytes,
+        //     imageFileExtension
+        // );
+
+        // this.view.updateUserInfo(user, user, authToken, rememberMe);
+        // this.view.navigate(`/feed/${user.alias}`);
+        // } catch (error) {
+        // this.view.displayErrorMessage(
+        //     `Failed to register user because of exception: ${error}`
+        // );
+        // } finally {
+        // // this.view.setIsLoading(false);
+        // }
     };
 
-    public async register (
-        firstName: string,
-        lastName: string,
-        alias: string,
-        password: string,
-        userImageBytes: Uint8Array,
-        imageFileExtension: string
-      ): Promise<[User, AuthToken]>{
-        return await this.userService.register(firstName, lastName, alias, password, userImageBytes, imageFileExtension);
-      };
+    // public async register (
+    //     firstName: string,
+    //     lastName: string,
+    //     alias: string,
+    //     password: string,
+    //     userImageBytes: Uint8Array,
+    //     imageFileExtension: string
+    //   ): Promise<[User, AuthToken]>{
+    //     return await this.userService.register(firstName, lastName, alias, password, userImageBytes, imageFileExtension);
+    //   };
 
 
     public handleImageFile (file: File | undefined) {

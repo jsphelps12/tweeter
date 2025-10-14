@@ -46,9 +46,9 @@ const Login = (props: Props) => {
   };
 
   const doLogin = async () => {
-    presenterRef.current!.doLogin(alias, password, rememberMe, props.originalUrl!);
+    // presenterRef.current!.doLogin(alias, password, rememberMe, props.originalUrl!);
     // try {
-    //   setIsLoading(true);
+    setIsLoading(true);
 
     //   const [user, authToken] = await presenterRef.current!.login(alias, password);
 
@@ -63,8 +63,9 @@ const Login = (props: Props) => {
     //   displayErrorMessage(
     //     `Failed to log user in because of exception: ${error}`
     //   );
+    presenterRef.current!.doLogin(alias, password, rememberMe, props.originalUrl!);
     // } finally {
-    //   setIsLoading(false);
+    setIsLoading(false);
     // }
   };
 
