@@ -35,7 +35,7 @@ export class RegisterPresenter extends Presenter<RegisterView> {
     };
 
     public async doRegister (firstName: string, lastName: string, alias: string, password: string, imageBytes: Uint8Array, imageFileExtension: string, rememberMe: boolean) {
-        this.doFailureReportingOperation(async () => {
+        await this.doFailureReportingOperation(async () => {
             const [user, authToken] = await this.userService.register(
                 firstName,
                 lastName,

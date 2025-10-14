@@ -125,7 +125,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     ): Promise<void> {
 
         var followingUserToast = "";
-        this.doFailureReportingOperation(async () => {
+        await this.doFailureReportingOperation(async () => {
           this.view.setIsLoading(true);
           followingUserToast = this.view.displayInfoMessage(
               `Following ${displayedUser!.name}...`,
@@ -176,7 +176,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
         displayedUser: User
     ): Promise<void>{
         var unfollowingUserToast = "";
-        this.doFailureReportingOperation(async () => {
+        await this.doFailureReportingOperation(async () => {
           this.view.setIsLoading(true);
           unfollowingUserToast = this.view.displayInfoMessage(
               `Unfollowing ${displayedUser!.name}...`,

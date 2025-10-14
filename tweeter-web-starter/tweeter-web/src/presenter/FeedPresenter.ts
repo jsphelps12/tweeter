@@ -14,7 +14,7 @@ export class FeedPresenter extends StatusItemPresenter{
 
 
     public async loadMoreItems (authToken: AuthToken, userAlias: string) {
-      this.doFailureReportingOperation(async () => {
+      await this.doFailureReportingOperation(async () => {
         const [newItems, hasMore] = await this.service.loadMoreStoryItems(
           authToken!,
           userAlias,

@@ -19,7 +19,7 @@ export class AppNavbarPresenter extends Presenter<AppNavbarView> {
 
     public async doLogOut (authToken: AuthToken) {
         const loggingOutToastId = this.view.displayInfoMessage("Logging Out...", 0);
-        this.doFailureReportingOperation(async () => {
+        await this.doFailureReportingOperation(async () => {
           await this.UserService.logout(authToken!);
     
           this.view.deleteMessage(loggingOutToastId);

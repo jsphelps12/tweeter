@@ -30,7 +30,7 @@ export class UserNavHooksPresenter extends Presenter<UserNavView> {
     };
 
     public async navigateToUser (event: string, authToken: AuthToken, displayedUser: User, featurePath: string): Promise<void> {
-        this.doFailureReportingOperation(async () => {
+        await this.doFailureReportingOperation(async () => {
              const alias = this.extractAlias(event);
 
             const toUser = await this.userService.getUser(authToken, alias);
