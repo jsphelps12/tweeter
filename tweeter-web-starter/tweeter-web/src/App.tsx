@@ -14,11 +14,11 @@ import UserItemScroller from "./components/mainLayout/UserItemScroller";
 import StatusItemScroller from "./components/mainLayout/StatusItemScroller";
 import { useUserInfo } from "./components/userInfo/UserInfoHooks";
 import { FolloweePresenter } from "./presenter/FolloweePresenter";
-import { UserItemView } from "./presenter/UserItemPresenter";
 import { FollowerPresenter } from "./presenter/FollowerPresenter";
 import { FeedPresenter } from "./presenter/FeedPresenter";
-import { StatusItemView } from "./presenter/StatusItemPresenter";
 import { StoryPresenter } from "./presenter/StoryPresenter";
+import { PagedItemView } from "./presenter/PagedItemPresenter";
+import { Status, User } from "tweeter-shared";
 
 const App = () => {
   const { currentUser, authToken } = useUserInfo();
@@ -52,22 +52,22 @@ const AuthenticatedRoutes = () => {
           element={<StatusItemScroller 
             key = {`feed-${displayedUser!.alias}`} 
             featureUrl="/feed" 
-            presenterFactory={(view: StatusItemView) => new FeedPresenter(view)} /> } />
+            presenterFactory={(view: PagedItemView<Status>) => new FeedPresenter(view)} /> } />
         <Route path="story/:displayedUser" 
           element={<StatusItemScroller  
             key = {`story-${displayedUser!.alias}`} 
             featureUrl="/story" 
-            presenterFactory={(view: StatusItemView) => new StoryPresenter(view)}/>} />
+            presenterFactory={(view: PagedItemView<Status>) => new StoryPresenter(view)}/>} />
         <Route path="followees/:displayedUser" 
           element={<UserItemScroller 
             key = {`followees-${displayedUser!.alias}`} 
             featureUrl="/followees" 
-            presenterFactory={(view: UserItemView) => new FolloweePresenter(view)}/>} />
+            presenterFactory={(view: PagedItemView<User>) => new FolloweePresenter(view)}/>} />
         <Route path="followers/:displayedUser" 
           element={<UserItemScroller 
             key = {`followers-${displayedUser!.alias}`}  
             featureUrl="/followers" 
-            presenterFactory={(view: UserItemView) => new FollowerPresenter(view)}/>} />
+            presenterFactory={(view: PagedItemView<User>) => new FollowerPresenter(view)}/>} />
         <Route path="logout" 
           element={<Navigate to="/login" />} />
         <Route path="*" 

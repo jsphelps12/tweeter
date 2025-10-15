@@ -3,25 +3,23 @@ import { UserService } from "../model.service/UserService";
 import { NavigateFunction } from "react-router-dom";
 import { Buffer } from "buffer";
 import { Presenter, View } from "./Presenter";
+import { AuthenticatorPresenter, AuthenticatorView } from "./AuthenticatorPresenter";
 
 
-export interface RegisterView extends View{
-    navigate: NavigateFunction;
-    setIsLoading: (isLoading: boolean) => void;
+export interface RegisterView extends AuthenticatorView{
     setImageUrl: (imageUrl: string) => void;
     setImageFileExtension: (imageFileExtension: string) => void
     setImageBytes: (imageBytes: Uint8Array) => void
-    updateUserInfo: (loggedInUser: User, displayedUser: User, authToken: AuthToken, rememberMe: boolean) => void;
   }
 
-export class RegisterPresenter extends Presenter<RegisterView> {
-    // Implementation not shown as it's not part of the comparison
-    private userService: UserService;
-    
-    constructor(view: RegisterView) {
-        super(view);
-        this.userService = new UserService();
-    }
+export class RegisterPresenter extends AuthenticatorPresenter<RegisterView> {
+
+    private firstName = "";
+    private lastName = ""
+    private alias = "";
+    private password = ""
+    private imageBytes: Uint8Array = new Uint8Array();
+    private imageFileExtension = "";
 
     public checkSubmitButtonStatus (firstName: string, lastName: string, alias: string, password: string, imageUrl: string, imageFileExtension: string): boolean {
         return (
@@ -34,54 +32,37 @@ export class RegisterPresenter extends Presenter<RegisterView> {
         );
     };
 
+    protected itemDescription(): string {
+        return "register user";
+    }
+    
+    protected async performAuth(firstName: string, lastName: string, alias: string, password: string, imageBytes: Uint8Array, imageFileExtension: string, rememberMe: boolean): Promise<[User, AuthToken]> {
+        return this.userService.register(firstName, lastName, alias, password, imageBytes, imageFileExtension);   
+    }
+
     public async doRegister (firstName: string, lastName: string, alias: string, password: string, imageBytes: Uint8Array, imageFileExtension: string, rememberMe: boolean) {
-        await this.doFailureReportingOperation(async () => {
-            const [user, authToken] = await this.userService.register(
-                firstName,
-                lastName,
-                alias,
-                password,
-                imageBytes,
-                imageFileExtension
-            );
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.alias = alias;
+        this.password = password;
+        this.imageBytes = imageBytes;
+        this.imageFileExtension = imageFileExtension;
+        await this.doAuthAction(rememberMe);
+        // await this.doFailureReportingOperation(async () => {
+        //     const [user, authToken] = await this.userService.register(
+        //         firstName,
+        //         lastName,
+        //         alias,
+        //         password,
+        //         imageBytes,
+        //         imageFileExtension
+        //     );
 
-            this.view.updateUserInfo(user, user, authToken, rememberMe);
-            this.view.navigate(`/feed/${user.alias}`);
-        }, "register user");
-        // try {
-        // // this.view.setIsLoading(true);
-
-        // const [user, authToken] = await this.userService.register(
-        //     firstName,
-        //     lastName,
-        //     alias,
-        //     password,
-        //     imageBytes,
-        //     imageFileExtension
-        // );
-
-        // this.view.updateUserInfo(user, user, authToken, rememberMe);
-        // this.view.navigate(`/feed/${user.alias}`);
-        // } catch (error) {
-        // this.view.displayErrorMessage(
-        //     `Failed to register user because of exception: ${error}`
-        // );
-        // } finally {
-        // // this.view.setIsLoading(false);
-        // }
+        //     this.view.updateUserInfo(user, user, authToken, rememberMe);
+        //     this.view.navigate(`/feed/${user.alias}`);
+        // }, "register user");
+        
     };
-
-    // public async register (
-    //     firstName: string,
-    //     lastName: string,
-    //     alias: string,
-    //     password: string,
-    //     userImageBytes: Uint8Array,
-    //     imageFileExtension: string
-    //   ): Promise<[User, AuthToken]>{
-    //     return await this.userService.register(firstName, lastName, alias, password, userImageBytes, imageFileExtension);
-    //   };
-
 
     public handleImageFile (file: File | undefined) {
         if (file) {
