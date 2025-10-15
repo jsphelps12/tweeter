@@ -36,8 +36,8 @@ export class RegisterPresenter extends AuthenticatorPresenter<RegisterView> {
         return "register user";
     }
     
-    protected async performAuth(firstName: string, lastName: string, alias: string, password: string, imageBytes: Uint8Array, imageFileExtension: string, rememberMe: boolean): Promise<[User, AuthToken]> {
-        return this.userService.register(firstName, lastName, alias, password, imageBytes, imageFileExtension);   
+    protected async performAuth(): Promise<[User, AuthToken]> {
+        return this.userService.register(this.firstName, this.lastName, this.alias, this.password, this.imageBytes, this.imageFileExtension);   
     }
 
     public async doRegister (firstName: string, lastName: string, alias: string, password: string, imageBytes: Uint8Array, imageFileExtension: string, rememberMe: boolean) {

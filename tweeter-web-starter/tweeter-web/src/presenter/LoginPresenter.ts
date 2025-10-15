@@ -12,8 +12,8 @@ export class LoginPresenter extends AuthenticatorPresenter<AuthenticatorView> {
         return "log user in";
     }
     
-    protected async performAuth(alias: string, password: string): Promise<[User, AuthToken]> {
-        return this.userService.login(alias, password);   
+    protected async performAuth(): Promise<[User, AuthToken]> {
+        return this.userService.login(this.alias, this.password);   
     }
 
     public async doLogin (alias: string, password: string, rememberMe: boolean, originalUrl: string): Promise<void> {
