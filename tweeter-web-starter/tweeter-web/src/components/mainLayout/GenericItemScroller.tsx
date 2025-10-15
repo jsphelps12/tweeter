@@ -4,8 +4,6 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { useParams } from "react-router-dom";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
-import UserItem from "../userItem/UserItem";
-import { UserItemPresenter } from "../../presenter/UserItemPresenter";
 import { PagedItemPresenter, PagedItemView } from "../../presenter/PagedItemPresenter";
 
 interface Props<T extends User | Status, P extends PagedItemPresenter<T, any>> {
