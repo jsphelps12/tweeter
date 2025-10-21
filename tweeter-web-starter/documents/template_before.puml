@@ -1,0 +1,27 @@
+@startuml
+' Before: duplicated paging behavior across presenters
+
+class FeedPresenter {
+  +loadMoreItems(authToken, alias)
+}
+
+class StoryPresenter {
+  +loadMoreItems(authToken, alias)
+}
+
+class FolloweePresenter {
+  +loadMoreItems(authToken, alias)
+}
+
+class StatusService
+class FollowService
+
+FeedPresenter --> StatusService : "calls loadMoreFeedItems"
+StoryPresenter --> StatusService : "calls loadMoreStoryItems"
+FolloweePresenter --> FollowService : "calls loadMoreFolloweeItems"
+
+note left
+Each presenter implements paging,
+error handling, and adds items to view.
+end note
+@enduml

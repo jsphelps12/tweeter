@@ -1,0 +1,24 @@
+@startuml
+' Simple class diagram for Story MVP flow
+
+class StoryPresenter {
+  - isLoading: boolean
+  - hasMorePages: boolean
+  + loadMoreItems(authToken, userAlias)
+}
+
+class StatusService {
+  + loadMoreStoryItems(authToken, userAlias, pageSize, lastItem): [Status[], boolean]
+  + loadMoreFeedItems(...)
+  + postStatus(...)
+}
+
+class PagedItemView {
+  + addItems(items: T[])
+  + displayErrorMessage(message: string)
+}
+
+StoryPresenter --> StatusService : uses
+StoryPresenter --> PagedItemView : updates
+
+@enduml

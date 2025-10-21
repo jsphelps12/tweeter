@@ -1,0 +1,44 @@
+@startuml
+' After: template method in PagedItemPresenter reduces duplication
+
+class PagedItemPresenter {
+  - lastItem
+  - hasMoreItems
+  + loadMoreItems(authToken, alias)
+  # getMoreItemsImplementation(authToken, alias)
+  # itemDescription()
+}
+
+class FeedPresenter {
+  + getMoreItemsImplementation(...)
+  + itemDescription()
+}
+
+class StoryPresenter {
+  + getMoreItemsImplementation(...)
+  + itemDescription()
+}
+
+class FolloweePresenter {
+  + getMoreItemsImplementation(...)
+  + itemDescription()
+}
+
+PagedItemPresenter <|-- FeedPresenter
+PagedItemPresenter <|-- StoryPresenter
+PagedItemPresenter <|-- FolloweePresenter
+
+PagedItemPresenter --> View : calls addItems / displayErrorMessage
+PagedItemPresenter --> StatusService : uses
+PagedItemPresenter --> FollowService : uses
+
+note left
+  Common behavior (template):
+  - loadMoreItems() orchestrates loading, error handling,
+    updating lastItem/hasMoreItems, and view.addItems().
+  Subclasses provide only:
+  - getMoreItemsImplementation()
+  - itemDescription()
+end note
+
+@enduml

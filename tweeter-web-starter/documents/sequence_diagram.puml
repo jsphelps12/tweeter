@@ -1,0 +1,21 @@
+@startuml
+actor User
+participant View as "GenericItemScroller"
+participant Presenter as "StoryPresenter"
+participant Service as "StatusService"
+participant Backend
+
+User -> View: open story page / story route
+View -> Presenter: loadMoreItems(authToken, userAlias)
+Presenter -> View: displayLoading()
+Presenter -> Service: loadMoreStoryItems(authToken, userAlias, pageSize, lastItem)
+Service -> Backend: HTTP GET /story?userAlias=...&limit=...
+Backend --> Service: 200 {statuses, hasMorePages}
+Service --> Presenter: [statuses, hasMorePages]
+alt statuses.length > 0
+  Presenter -> View: addItems(statuses)
+else
+  Presenter -> View: displayEmpty()
+end
+
+@enduml
