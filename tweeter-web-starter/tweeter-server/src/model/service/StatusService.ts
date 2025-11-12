@@ -1,31 +1,32 @@
-import { AuthToken, Status, FakeData } from "tweeter-shared";
+import { AuthToken, Status, FakeData, StatusDto } from "tweeter-shared";
 import { Service } from "./Service";
 
 export class StatusService implements Service{
 
     public async loadMoreFeedItems (
-        authToken: AuthToken,
+        authToken: string,
         userAlias: string,
         pageSize: number,
-        lastItem: Status | null
-      ): Promise<[Status[], boolean]> {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+        lastItem: StatusDto | null
+      ): Promise<[StatusDto[], boolean]> {
+        const [items, hasMore] = FakeData.instance.getPageOfStatuses(Status.fromDto(lastItem), pageSize);
+        return [items.map(status => status.dto), hasMore];
       };
 
     public async loadMoreStoryItems (
-        authToken: AuthToken,
+        authToken: string,
         userAlias: string,
         pageSize: number,
-        lastItem: Status | null
-      ): Promise<[Status[], boolean]> {
+        lastItem: StatusDto | null
+      ): Promise<[StatusDto[], boolean]> {
         // TODO: Replace with the result of calling server
-        return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+        const [items, hasMore] = FakeData.instance.getPageOfStatuses(Status.fromDto(lastItem), pageSize);
+        return [items.map(status => status.dto), hasMore];
       };
 
     public async postStatus  (
-      authToken: AuthToken,
-      newStatus: Status
+      authToken: string,
+      newStatus: StatusDto
     ): Promise<void> {
       // Pause so we can see the logging out message. Remove when connected to the server
       await new Promise((f) => setTimeout(f, 2000));

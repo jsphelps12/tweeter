@@ -1,6 +1,7 @@
 import { PostSegment, Type } from "./PostSegment";
 import { User } from "./User";
 import { format } from "date-fns";
+import { StatusDto } from "../dto/StatusDto";
 
 export class Status {
   private _post: string;
@@ -241,6 +242,29 @@ export class Status {
       this._timestamp === other._timestamp &&
       this._post === other.post
     );
+  }
+
+  public get dto(): StatusDto {
+    return {
+      post: this._post,
+      user: this._user.dto,
+      timestamp: this._timestamp,
+      segments: this._segments.map(seg => seg.dto)
+    };
+  }
+
+  public static fromDto(dto: StatusDto | null): Status | null{
+    if (dto == null) {
+      return null;
+    }
+    const status = new Status(
+      dto.post,
+      User.fromDto(dto.user)!,
+      dto.timestamp
+    );
+    // Override the auto-generated segments with the ones from the DTO
+    status._segments = dto.segments.map(segDto => PostSegment.fromDto(segDto));
+    return status;
   }
 
   public static fromJson(json: string | null | undefined): Status | null {

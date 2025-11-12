@@ -1,3 +1,5 @@
+import { PostSegmentDto } from "../dto/PostSegmentDto";
+
 export enum Type {
   text = "Text",
   alias = "Alias",
@@ -37,5 +39,18 @@ export class PostSegment {
 
   public get type(): Type {
     return this._type;
+  }
+
+  public get dto(): PostSegmentDto {
+    return {
+      text: this._text,
+      startPostion: this._startPostion,
+      endPosition: this._endPosition,
+      type: this._type
+    };
+  }
+
+  public static fromDto(dto: PostSegmentDto): PostSegment {
+    return new PostSegment(dto.text, dto.startPostion, dto.endPosition, dto.type);
   }
 }
