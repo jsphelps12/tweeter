@@ -10,15 +10,8 @@ export class FollowService implements Service{
       pageSize: number,
       lastItem: UserDto | null
     ): Promise<[UserDto[], boolean]>{
-      // TODO: Replace with the result of calling server
       return this.getFakeData(lastItem, pageSize, userAlias);
     };
-
-  private async getFakeData(lastItem: UserDto | null, pageSize: number, userAlias: string): Promise<[UserDto[], boolean]> {
-    const [items, hasMore] = FakeData.instance.getPageOfUsers(User.fromDto(lastItem), pageSize, userAlias);
-    const itemsDto = items.map((user) => user.dto);
-    return [itemsDto, hasMore];
-  }
 
   public async loadMoreFollowers(
       authToken: string,
@@ -26,9 +19,14 @@ export class FollowService implements Service{
       pageSize: number,
       lastItem: UserDto | null
     ): Promise<[UserDto[], boolean]>{
-      // TODO: Replace with the result of calling server
-      return FakeData.instance.getPageOfUsers(User.fromDto(lastItem), pageSize, userAlias);
+      return this.getFakeData(lastItem, pageSize, userAlias);
     };
+
+    private async getFakeData(lastItem: UserDto | null, pageSize: number, userAlias: string): Promise<[UserDto[], boolean]> {
+      const [items, hasMore] = FakeData.instance.getPageOfUsers(User.fromDto(lastItem), pageSize, userAlias);
+      const itemsDto = items.map((user) => user.dto);
+      return [itemsDto, hasMore];
+    }
 
     public async getFollowerCount  (
     authToken: AuthToken,

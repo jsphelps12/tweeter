@@ -27,8 +27,14 @@ export class FollowService implements Service{
       pageSize: number,
       lastItem: User | null
     ): Promise<[User[], boolean]>{
-      // TODO: Replace with the result of calling server
-      return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
+      const request = {
+        token: authToken.token,
+        userAlias: userAlias,
+        pageSize: pageSize,
+        lastItem: lastItem ? lastItem.dto : null
+      };
+      
+      return this.serverFacade.getMoreFollowers(request);
     };
 
     public async getFollowerCount  (
