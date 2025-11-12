@@ -1,4 +1,6 @@
 import {
+  GetCountRequest,
+  GetCountResponse,
   PagedUserItemRequest,
   PagedUserItemResponse,
   User,
@@ -64,4 +66,47 @@ export class ServerFacade {
       throw new Error(response.message ?? undefined);
     }
   }
+
+  public async getFollowerCount(
+    request: GetCountRequest
+  ): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      GetCountRequest,
+      GetCountResponse
+    >(request, "/follow/getfollowercount");
+
+    // Handle errors
+    if (response.success) {
+      if (response.count == null) {
+        throw new Error(`No follower count found`);
+      } else {
+        return response.count;
+      }
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async getFolloweeCount(
+    request: GetCountRequest
+  ): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      GetCountRequest,
+      GetCountResponse
+    >(request, "/follow/getfolloweecount");
+
+    // Handle errors
+    if (response.success) {
+      if (response.count == null) {
+        throw new Error(`No follower count found`);
+      } else {
+        return response.count;
+      }
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+  
 }

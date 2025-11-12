@@ -9,11 +9,13 @@ export { AuthToken } from "./model/domain/AuthToken";
 // Request export
 export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest";
 export type { TweeterRequest } from "./model/net/request/TweeterRequest";
+export type { GetCountRequest } from "./model/net/request/GetCountRequest";
 
 
 // Response export
 export type { PagedUserItemResponse } from "./model/net/response/PagedUseritemResponse";
 export type { TweeterResponse } from "./model/net/response/TweeterResponse";
+export type { GetCountResponse } from "./model/net/response/GetCountResponse";
 
 
 // DTO exports
