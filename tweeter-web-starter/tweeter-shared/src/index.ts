@@ -10,12 +10,14 @@ export { AuthToken } from "./model/domain/AuthToken";
 export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest";
 export type { TweeterRequest } from "./model/net/request/TweeterRequest";
 export type { GetCountRequest } from "./model/net/request/GetCountRequest";
+export type { IsFollowerRequest } from "./model/net/request/IsFollowerRequest";
 
 
 // Response export
 export type { PagedUserItemResponse } from "./model/net/response/PagedUseritemResponse";
 export type { TweeterResponse } from "./model/net/response/TweeterResponse";
 export type { GetCountResponse } from "./model/net/response/GetCountResponse";
+export type { IsFollowerResponse } from "./model/net/response/IsFollowerResponse";
 
 
 // DTO exports

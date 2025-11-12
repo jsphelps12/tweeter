@@ -1,4 +1,3 @@
-
 import { GetCountRequest, GetCountResponse } from "tweeter-shared";
 import { FollowService } from "../../model/service/FollowService";
 
