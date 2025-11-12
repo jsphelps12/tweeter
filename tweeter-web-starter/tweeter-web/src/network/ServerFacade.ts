@@ -1,4 +1,6 @@
 import {
+  FollowRequest,
+  FollowResponse,
   GetCountRequest,
   GetCountResponse,
   IsFollowerRequest,
@@ -126,6 +128,40 @@ export class ServerFacade {
       } else {
         return response.isFollower;
       }
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async follow(
+    request: FollowRequest
+  ): Promise<FollowResponse> {
+    const response = await this.clientCommunicator.doPost<
+      FollowRequest,
+      FollowResponse
+    >(request, "/follow/follow");
+
+    // Handle errors
+    if (response.success) {
+      return response;
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async unfollow(
+    request: FollowRequest
+  ): Promise<FollowResponse> {
+    const response = await this.clientCommunicator.doPost<
+      FollowRequest,
+      FollowResponse
+    >(request, "/follow/unfollow");
+
+    // Handle errors
+    if (response.success) {
+      return response;
     } else {
       console.error(response);
       throw new Error(response.message ?? undefined);

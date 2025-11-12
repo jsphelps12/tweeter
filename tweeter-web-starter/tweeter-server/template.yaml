@@ -170,6 +170,32 @@ Resources:
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
 
+          /follow/follow:  
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FollowFunction.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
+
+          /follow/unfollow:  
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UnfollowFunction.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
+
 
   #
   # Lambda Layer (reused by all Lambda functions)
@@ -257,6 +283,34 @@ Resources:
           Properties:
             RestApiId: !Ref tweeterApi
             Path: /follow/getisfollowerstatus
+            Method: POST
+
+  FollowFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: FollowFunction
+      Handler: lambda/follow/FollowLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /follow/follow
+            Method: POST
+
+  UnfollowFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: UnfollowFunction
+      Handler: lambda/follow/UnfollowLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /follow/unfollow
             Method: POST
 
 
