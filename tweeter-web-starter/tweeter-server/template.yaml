@@ -150,3 +150,9 @@ Resources:
             RestApiId: !Ref tweeterApi
             Path: /follow/getfollowees
             Method: POST
+
+
+Outputs:
+  TweeterApiUrl:
+    Description: "API Gateway endpoint URL for Tweeter"
+    Value: !Sub "https://${tweeterApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"

@@ -6,8 +6,9 @@ export { Status } from "./model/domain/Status";
 export { User } from "./model/domain/User";
 export { AuthToken } from "./model/domain/AuthToken";
 
-
+// Request export
 export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest";
+export type { TweeterRequest } from "./model/net/request/TweeterRequest";
 
 
 // Response export
