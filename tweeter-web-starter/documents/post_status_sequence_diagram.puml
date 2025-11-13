@@ -1,0 +1,140 @@
+@startuml PostStatusSequenceDiagram
+
+title Post Status Sequence Diagram
+
+actor User
+participant ":PostStatus" as PostStatus <<Component>>
+participant ":PostStatusPresenter" as Presenter <<Presenter>>
+participant "listener:PostStatusView" as View <<View>>
+participant ":StatusService" as Service <<Service>>
+participant ":ServerFacade" as Facade <<ServerFacade>>
+participant ":ClientCommunicator" as Client <<ClientCommunicator>>
+participant "API Gateway" as Gateway <<AWS>>
+participant ":PostStatusLambda" as Lambda <<Lambda>>
+participant ":StatusService" as ServerService <<Server Service>>
+
+== User Posts Status ==
+
+User -> PostStatus: clicks "Post Status"
+activate PostStatus
+
+PostStatus -> Presenter: submitPost(post, currentUser, authToken)
+activate Presenter
+
+Presenter -> View: displayInfoMessage("Posting status...")
+activate View
+View --> Presenter
+deactivate View
+
+Presenter -> Presenter: extractSegments(post)
+activate Presenter
+Presenter --> Presenter: segments[]
+deactivate Presenter
+
+Presenter -> Presenter: createStatus(post, currentUser, segments)
+activate Presenter
+Presenter --> Presenter: newStatus:Status
+deactivate Presenter
+
+Presenter -> Service: postStatus(authToken, newStatus): Promise<void>
+activate Service
+
+Service -> Service: buildRequest(authToken, newStatus)
+activate Service
+note right: Convert Status to StatusDto\nrequest = {\n  token: authToken.token,\n  newStatus: newStatus.dto\n}
+Service --> Service: request:PostStatusRequest
+deactivate Service
+
+Service -> Facade: postStatus(request): Promise<void>
+activate Facade
+
+Facade -> Client: doPost<PostStatusRequest, PostStatusResponse>(request, "/status/poststatus"): Promise<PostStatusResponse>
+activate Client
+
+Client -> Client: buildRequestParams(request)
+activate Client
+note right: params = {\n  method: "POST",\n  headers: {},\n  body: JSON.stringify(request)\n}
+Client --> Client: params
+deactivate Client
+
+Client -> Gateway: fetch(url, params): Promise<Response>
+activate Gateway
+note right: HTTPS POST to:\n/prod/status/poststatus
+
+Gateway -> Lambda: invoke(event): Promise<Response>
+activate Lambda
+
+Lambda -> Lambda: parseRequest(event.body): PostStatusRequest
+activate Lambda
+Lambda --> Lambda: request:PostStatusRequest
+deactivate Lambda
+
+Lambda -> ServerService: postStatus(token, newStatus): Promise<void>
+activate ServerService
+
+ServerService -> ServerService: validateAuthToken(token)
+activate ServerService
+ServerService --> ServerService: valid:boolean
+deactivate ServerService
+
+note over ServerService: TODO: Store status in database\nTODO: Update followers' feeds\n(Currently using FakeData)
+
+ServerService --> Lambda: void
+deactivate ServerService
+
+Lambda -> Lambda: buildResponse()
+activate Lambda
+note right: response = {\n  success: true,\n  message: null\n}
+Lambda --> Lambda: response:PostStatusResponse
+deactivate Lambda
+
+Lambda --> Gateway: response:PostStatusResponse
+deactivate Lambda
+
+Gateway --> Client: Response(JSON)
+deactivate Gateway
+
+Client -> Client: parseResponse(response): PostStatusResponse
+activate Client
+Client --> Client: parsedResponse:PostStatusResponse
+deactivate Client
+
+Client --> Facade: parsedResponse:PostStatusResponse
+deactivate Client
+
+Facade -> Facade: handleResponse(parsedResponse)
+activate Facade
+alt response.success == true
+    Facade --> Service: void
+else response.success == false
+    Facade -> Facade: throw Error(response.message)
+    Facade --> Service: Error
+end
+deactivate Facade
+
+Service --> Presenter: void
+deactivate Service
+
+Presenter -> View: clearLastInfoMessage()
+activate View
+View --> Presenter
+deactivate View
+
+Presenter -> View: displayInfoMessage("Status posted!")
+activate View
+View --> Presenter
+deactivate View
+
+Presenter -> Presenter: clearPost()
+activate Presenter
+note right: Clear the post input field
+Presenter --> Presenter
+deactivate Presenter
+
+Presenter --> PostStatus: void
+deactivate Presenter
+
+PostStatus --> User
+deactivate PostStatus
+
+@enduml
