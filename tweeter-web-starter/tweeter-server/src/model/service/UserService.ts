@@ -9,7 +9,6 @@ export class UserService  implements Service{
     authToken: string,
     alias: string
   ): Promise<UserDto | null>{
-    // TODO: Replace with the result of calling server
     const user = FakeData.instance.findUserByAlias(alias);
     return user ? user.dto : null;
   };
@@ -18,7 +17,6 @@ export class UserService  implements Service{
     alias: string,
     password: string
   ): Promise<[UserDto, AuthTokenDto]> {
-    // TODO: Replace with the result of calling the server
     const user = FakeData.instance.firstUser;
 
     if (user === null) {
@@ -44,7 +42,6 @@ export class UserService  implements Service{
       imageFileExtension: string
     ): Promise<[UserDto, AuthTokenDto]> {
       
-      // TODO: Replace with the result of calling the server
       const user = FakeData.instance.firstUser;
   
       if (user === null) {
