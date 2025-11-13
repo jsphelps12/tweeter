@@ -1,16 +1,25 @@
 import {
+  AuthToken,
   FollowRequest,
   FollowResponse,
   GetCountRequest,
   GetCountResponse,
+  GetUserRequest,
+  GetUserResponse,
   IsFollowerRequest,
   IsFollowerResponse,
+  LoginRequest,
+  LoginResponse,
+  LogoutRequest,
+  LogoutResponse,
   PagedStatusItemRequest,
   PagedStatusItemResponse,
   PagedUserItemRequest,
   PagedUserItemResponse,
   PostStatusRequest,
   PostStatusResponse,
+  RegisterRequest,
+  RegisterResponse,
   Status,
   User,
   UserDto,
@@ -141,7 +150,7 @@ export class ServerFacade {
 
   public async follow(
     request: FollowRequest
-  ): Promise<FollowResponse> {
+  ): Promise<[followerCount: number, followeeCount: number]> {
     const response = await this.clientCommunicator.doPost<
       FollowRequest,
       FollowResponse
@@ -149,7 +158,7 @@ export class ServerFacade {
 
     // Handle errors
     if (response.success) {
-      return response;
+      return [response.followerCount, response.followeeCount];
     } else {
       console.error(response);
       throw new Error(response.message ?? undefined);
@@ -158,7 +167,7 @@ export class ServerFacade {
 
   public async unfollow(
     request: FollowRequest
-  ): Promise<FollowResponse> {
+  ): Promise<[followerCount: number, followeeCount: number]> {
     const response = await this.clientCommunicator.doPost<
       FollowRequest,
       FollowResponse
@@ -166,7 +175,7 @@ export class ServerFacade {
 
     // Handle errors
     if (response.success) {
-      return response;
+      return [response.followerCount, response.followeeCount];
     } else {
       console.error(response);
       throw new Error(response.message ?? undefined);
@@ -246,5 +255,85 @@ export class ServerFacade {
       throw new Error(response.message ?? undefined);
     }
   }
-  
+
+  public async getUser(
+    request: GetUserRequest
+  ): Promise<User | null> {
+    const response = await this.clientCommunicator.doPost<
+      GetUserRequest,
+      GetUserResponse
+    >(request, "/user/getuser");
+
+    // Handle errors
+    if (response.success) {
+      if (response.user == null) {
+        return null;
+      } else {
+        return User.fromDto(response.user);
+      }
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async login(
+    request: LoginRequest
+  ): Promise<[User, AuthToken]> {
+    const response = await this.clientCommunicator.doPost<
+      LoginRequest,
+      LoginResponse
+    >(request, "/user/login");
+
+    // Handle errors
+    if (response.success) {
+      const user = User.fromDto(response.user);
+      if (user == null) {
+        throw new Error("Login failed: user data is null");
+      }
+      return [user, AuthToken.fromDto(response.authToken)! ];
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async logout(
+    request: LogoutRequest
+  ): Promise<void> {
+    const response = await this.clientCommunicator.doPost<
+      LogoutRequest,
+      LogoutResponse
+    >(request, "/user/logout");
+
+    // Handle errors
+    if (response.success) {
+      return;
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async register(
+    request: RegisterRequest
+  ): Promise<[User, AuthToken]> {
+    const response = await this.clientCommunicator.doPost<
+      RegisterRequest,
+      RegisterResponse
+    >(request, "/user/register");
+
+    // Handle errors
+    if (response.success) {
+      const user = User.fromDto(response.user);
+      if (user == null) {
+        throw new Error("Registration failed: user data is null");
+      }
+      return [user, AuthToken.fromDto(response.authToken)! ];
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
 }

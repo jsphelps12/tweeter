@@ -80,9 +80,7 @@ export class FollowService implements Service{
           token: authToken.token,
           userToFollow: userToFollow.dto
         };
-        const response = await this.serverFacade.follow(request);
-
-        return [response.followerCount, response.followeeCount];
+        return this.serverFacade.follow(request);
     };
 
     public async unfollow  (
@@ -93,8 +91,6 @@ export class FollowService implements Service{
           token: authToken.token,
           userToFollow: userToUnfollow.dto
         };
-        const response = await this.serverFacade.follow(request);
-
-        return [response.followerCount, response.followeeCount];
+        return this.serverFacade.follow(request);
     };
 }

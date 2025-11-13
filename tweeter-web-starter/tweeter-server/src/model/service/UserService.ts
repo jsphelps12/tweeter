@@ -1,22 +1,23 @@
 import { Buffer } from "buffer";
-import { AuthToken, User, FakeData } from "tweeter-shared";
+import { AuthToken, User, FakeData, UserDto, AuthTokenDto } from "tweeter-shared";
 import { Service } from "./Service";
 
 export class UserService  implements Service{
     
 
   public async getUser(
-    authToken: AuthToken,
+    authToken: string,
     alias: string
-  ): Promise<User | null>{
+  ): Promise<UserDto | null>{
     // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
+    const user = FakeData.instance.findUserByAlias(alias);
+    return user ? user.dto : null;
   };
 
   public async login (
     alias: string,
     password: string
-  ): Promise<[User, AuthToken]> {
+  ): Promise<[UserDto, AuthTokenDto]> {
     // TODO: Replace with the result of calling the server
     const user = FakeData.instance.firstUser;
 
@@ -24,10 +25,12 @@ export class UserService  implements Service{
       throw new Error("Invalid alias or password");
     }
 
-    return [user, FakeData.instance.authToken];
+    return [user.dto, FakeData.instance.authToken.dto];
   };
 
-  public async logout (authToken: AuthToken): Promise<void> {
+  public async logout (
+    authToken: string
+  ): Promise<void> {
     // Pause so we can see the logging out message. Delete when the call to the server is implemented.
     await new Promise((res) => setTimeout(res, 1000));
   };
@@ -37,13 +40,10 @@ export class UserService  implements Service{
       lastName: string,
       alias: string,
       password: string,
-      userImageBytes: Uint8Array,
+      userImageBytes: string,
       imageFileExtension: string
-    ): Promise<[User, AuthToken]> {
-      // Not neded now, but will be needed when you make the request to the server in milestone 3
-      const imageStringBase64: string =
-        Buffer.from(userImageBytes).toString("base64");
-  
+    ): Promise<[UserDto, AuthTokenDto]> {
+      
       // TODO: Replace with the result of calling the server
       const user = FakeData.instance.firstUser;
   
@@ -51,7 +51,7 @@ export class UserService  implements Service{
         throw new Error("Invalid registration");
       }
   
-      return [user, FakeData.instance.authToken];
+      return [user.dto, FakeData.instance.authToken.dto];
     };
 
 }
