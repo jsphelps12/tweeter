@@ -3,6 +3,23 @@ import { UserService } from "../../model/service/UserService";
 
 export const handler = async (request: RegisterRequest): Promise<RegisterResponse> => {
 
+    // // Validation for 400 Bad Request
+    // if (!request.firstName || request.firstName.trim() === '') {
+    //     throw new Error('[bad-request] First name is required');
+    // }
+    // if (!request.lastName || request.lastName.trim() === '') {
+    //     throw new Error('[bad-request] Last name is required');
+    // }
+    // if (!request.alias || request.alias.trim() === '') {
+    //     throw new Error('[bad-request] Alias is required');
+    // }
+    // if (!request.password || request.password.trim() === '') {
+    //     throw new Error('[bad-request] Password is required');
+    // }
+    // if (!request.userImageBytes || request.userImageBytes.trim() === '') {
+    //     throw new Error('[bad-request] User image is required');
+    // }
+
     const userService = new UserService();
     const [user, authToken] = await userService.register(
         request.firstName,
