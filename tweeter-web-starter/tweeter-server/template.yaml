@@ -503,6 +503,110 @@ Resources:
             Method: POST
 
 
+  #
+  # DynamoDB Tables
+  #
+
+  AuthTokensTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: tweeter-auth-tokens
+      AttributeDefinitions:
+        - AttributeName: token
+          AttributeType: S
+      KeySchema:
+        - AttributeName: token
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: tweeter-users
+      AttributeDefinitions:
+        - AttributeName: alias
+          AttributeType: S
+      KeySchema:
+        - AttributeName: alias
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  FollowsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: tweeter-follows
+      AttributeDefinitions:
+        - AttributeName: follower_alias
+          AttributeType: S
+        - AttributeName: followee_alias
+          AttributeType: S
+      KeySchema:
+        - AttributeName: follower_alias
+          KeyType: HASH
+        - AttributeName: followee_alias
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - IndexName: followee_follower_index
+          KeySchema:
+            - AttributeName: followee_alias
+              KeyType: HASH
+            - AttributeName: follower_alias
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  StatusesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: tweeter-statuses
+      AttributeDefinitions:
+        - AttributeName: author_alias
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: author_alias
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+  FeedsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: tweeter-feeds
+      AttributeDefinitions:
+        - AttributeName: recipient_alias
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: recipient_alias
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+
+  #
+  # S3 Bucket
+  #
+
+  ProfileImagesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: tweeter-profile-images-340
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: ObjectWriter
+
+
 Outputs:
   TweeterApiUrl:
     Description: "API Gateway endpoint URL for Tweeter"
