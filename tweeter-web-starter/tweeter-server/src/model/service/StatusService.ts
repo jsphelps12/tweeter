@@ -1,4 +1,4 @@
-import { StatusDto } from "tweeter-shared";
+import { StatusDto, Status, User } from "tweeter-shared";
 import { Service } from "./Service";
 import { DAOFactory } from "../dao/factory/DAOFactory";
 import { StatusDAO } from "../dao/interface/StatusDAO";
@@ -125,17 +125,17 @@ export class StatusService implements Service {
                 throw new Error(`User not found: ${status.authorAlias}`);
             }
 
-            return {
-                post: status.post,
-                user: {
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    alias: user.alias,
-                    imageUrl: user.imageUrl
-                },
-                timestamp: status.timestamp,
-                segments: [] // Segments will be computed on the client side
-            };
+            // Create User and Status objects to parse segments
+            const userObj = new User(
+                user.firstName,
+                user.lastName,
+                user.alias,
+                user.imageUrl
+            );
+            const statusObj = new Status(status.post, userObj, status.timestamp);
+
+            // Return the DTO with parsed segments
+            return statusObj.dto;
         });
 
         return Promise.all(statusDtoPromises);

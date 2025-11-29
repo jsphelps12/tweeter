@@ -1,7 +1,9 @@
 import { RegisterRequest, RegisterResponse } from "tweeter-shared";
 import { UserService } from "../../model/service/UserService";
+import { initializeDAOFactory } from "../InitializeDAOFactory";
 
 export const handler = async (request: RegisterRequest): Promise<RegisterResponse> => {
+    initializeDAOFactory();
 
     // // Validation for 400 Bad Request
     // if (!request.firstName || request.firstName.trim() === '') {

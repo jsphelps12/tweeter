@@ -28,6 +28,11 @@ export class UserService implements Service {
         // Validate the auth token
         await this.authHelper.validateAuthToken(authToken);
 
+        // Remove @ prefix if present (aliases stored without @)
+        if (alias.startsWith('@')) {
+            alias = alias.substring(1);
+        }
+
         // Get user from database
         const user = await this.userDAO.getUser(alias);
         
@@ -48,6 +53,11 @@ export class UserService implements Service {
         alias: string,
         password: string
     ): Promise<[UserDto, AuthTokenDto]> {
+        // Remove @ prefix if present (aliases stored without @)
+        if (alias.startsWith('@')) {
+            alias = alias.substring(1);
+        }
+
         // Get user from database
         const user = await this.userDAO.getUser(alias);
         if (!user) {
@@ -101,6 +111,11 @@ export class UserService implements Service {
         userImageBytes: string,
         imageFileExtension: string
     ): Promise<[UserDto, AuthTokenDto]> {
+        // Remove @ prefix if present (aliases stored without @)
+        if (alias.startsWith('@')) {
+            alias = alias.substring(1);
+        }
+
         // Check if user already exists
         const existingUser = await this.userDAO.getUser(alias);
         if (existingUser) {

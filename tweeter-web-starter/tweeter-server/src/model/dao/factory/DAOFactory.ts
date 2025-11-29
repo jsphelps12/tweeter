@@ -31,6 +31,13 @@ export abstract class DAOFactory {
         DAOFactory.instance = factory;
     }
 
+    /**
+     * Checks if the factory instance has been set.
+     */
+    public static hasInstance(): boolean {
+        return DAOFactory.instance !== undefined;
+    }
+
     // Factory methods for creating DAOs
     abstract createUserDAO(): UserDAO;
     abstract createAuthTokenDAO(): AuthTokenDAO;

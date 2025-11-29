@@ -596,7 +596,7 @@ Resources:
   ProfileImagesBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: tweeter-profile-images-340
+      BucketName: tweeter-profile-images-jsphelps12
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false

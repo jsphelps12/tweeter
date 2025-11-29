@@ -25,8 +25,17 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     }
 
     public getBaseUrl = (): string => {
-        const segments = location.pathname.split("/@");
-        return segments.length > 1 ? segments[0] : "/";
+        // Get the base path (e.g., "/story" or "/feed") by removing the last segment (username)
+        // Handles paths like: /story/user1 -> /story, /feed/user2 -> /feed
+        const pathSegments = location.pathname.split('/').filter(s => s);
+        
+        if (pathSegments.length === 0) {
+            return "/"; // Root path
+        } else if (pathSegments.length === 1) {
+            return `/${pathSegments[0]}`; // Already at base (e.g., /story)
+        } else {
+            return `/${pathSegments[0]}`; // Return first segment (e.g., /story from /story/user1)
+        }
     };
 
     public switchToLoggedInUser(currentUser: User): void {

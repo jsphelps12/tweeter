@@ -224,12 +224,12 @@ const UserInfo = () => {
               {!displayedUser.equals(currentUser) && (
                 <p id="returnToLoggedInUser">
                   Return to{" "}
-                  <Link
-                    to={`./${currentUser.alias}`}
+                  <a
+                    href="#"
                     onClick={switchToLoggedInUser}
                   >
                     logged in user
-                  </Link>
+                  </a>
                 </p>
               )}
               <h2>

@@ -1,7 +1,7 @@
 import { ImageDAO } from "../interface/ImageDAO";
 import { S3Client, PutObjectCommand, DeleteObjectCommand, ObjectCannedACL } from "@aws-sdk/client-s3";
 
-const BUCKET = "tweeter-profile-images-340";
+const BUCKET = "tweeter-profile-images-jsphelps12";
 const REGION = "us-east-1";
 
 export class S3ImageDAO implements ImageDAO {

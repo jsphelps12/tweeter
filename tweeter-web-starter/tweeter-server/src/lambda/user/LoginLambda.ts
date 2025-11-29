@@ -1,7 +1,9 @@
 import { LoginRequest, LoginResponse } from "tweeter-shared";
 import { UserService } from "../../model/service/UserService";
+import { initializeDAOFactory } from "../InitializeDAOFactory";
 
 export const handler = async (request: LoginRequest): Promise<LoginResponse> => {
+    initializeDAOFactory();
 
     // // Validation for 400 Bad Request
     // if (!request.alias || request.alias.trim() === '') {
