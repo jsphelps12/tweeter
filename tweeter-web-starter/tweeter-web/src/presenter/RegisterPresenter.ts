@@ -48,20 +48,6 @@ export class RegisterPresenter extends AuthenticatorPresenter<RegisterView> {
         this.imageBytes = imageBytes;
         this.imageFileExtension = imageFileExtension;
         await this.doAuthAction(rememberMe);
-        // await this.doFailureReportingOperation(async () => {
-        //     const [user, authToken] = await this.userService.register(
-        //         firstName,
-        //         lastName,
-        //         alias,
-        //         password,
-        //         imageBytes,
-        //         imageFileExtension
-        //     );
-
-        //     this.view.updateUserInfo(user, user, authToken, rememberMe);
-        //     this.view.navigate(`/feed/${user.alias}`);
-        // }, "register user");
-        
     };
 
     public handleImageFile (file: File | undefined) {
@@ -72,20 +58,18 @@ export class RegisterPresenter extends AuthenticatorPresenter<RegisterView> {
         reader.onload = (event: ProgressEvent<FileReader>) => {
             const imageStringBase64 = event.target?.result as string;
     
-            // Remove unnecessary file metadata from the start of the string.
             const imageStringBase64BufferContents =
             imageStringBase64.split("base64,")[1];
     
-            const bytes: Uint8Array = Buffer.from(
-            imageStringBase64BufferContents,
-            "base64"
+            const bytes = Uint8Array.from(
+              atob(imageStringBase64BufferContents),
+              c => c.charCodeAt(0)
             );
     
             this.view.setImageBytes(bytes);
         };
         reader.readAsDataURL(file);
     
-        // Set image file extension (and move to a separate method)
         const fileExtension = this.getFileExtension(file);
         if (fileExtension) {
             this.view.setImageFileExtension(fileExtension);
