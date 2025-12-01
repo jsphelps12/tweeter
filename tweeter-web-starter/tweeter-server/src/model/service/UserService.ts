@@ -25,22 +25,18 @@ export class UserService implements Service {
         authToken: string,
         alias: string
     ): Promise<UserDto | null> {
-        // Validate the auth token
         await this.authHelper.validateAuthToken(authToken);
 
-        // Remove @ prefix if present (aliases stored without @)
         if (alias.startsWith('@')) {
             alias = alias.substring(1);
         }
 
-        // Get user from database
         const user = await this.userDAO.getUser(alias);
         
         if (!user) {
             return null;
         }
 
-        // Convert to DTO
         return {
             firstName: user.firstName,
             lastName: user.lastName,
@@ -53,18 +49,15 @@ export class UserService implements Service {
         alias: string,
         password: string
     ): Promise<[UserDto, AuthTokenDto]> {
-        // Remove @ prefix if present (aliases stored without @)
         if (alias.startsWith('@')) {
             alias = alias.substring(1);
         }
 
-        // Get user from database
         const user = await this.userDAO.getUser(alias);
         if (!user) {
             throw new Error("[bad-request] Invalid alias or password");
         }
 
-        // Get and verify password hash
         const passwordHash = await this.userDAO.getPasswordHash(alias);
         if (!passwordHash) {
             throw new Error("[bad-request] Invalid alias or password");
@@ -75,11 +68,9 @@ export class UserService implements Service {
             throw new Error("[bad-request] Invalid alias or password");
         }
 
-        // Generate auth token
         const token = AuthToken.Generate();
         await this.authTokenDAO.putAuthToken(token.token, alias, token.timestamp);
 
-        // Return user and token DTOs
         const userDto: UserDto = {
             firstName: user.firstName,
             lastName: user.lastName,
@@ -96,10 +87,8 @@ export class UserService implements Service {
     }
 
     public async logout(authToken: string): Promise<void> {
-        // Validate the auth token
         await this.authHelper.validateAuthToken(authToken);
 
-        // Delete the auth token
         await this.authTokenDAO.deleteAuthToken(authToken);
     }
 
@@ -111,33 +100,26 @@ export class UserService implements Service {
         userImageBytes: string,
         imageFileExtension: string
     ): Promise<[UserDto, AuthTokenDto]> {
-        // Remove @ prefix if present (aliases stored without @)
         if (alias.startsWith('@')) {
             alias = alias.substring(1);
         }
 
-        // Check if user already exists
         const existingUser = await this.userDAO.getUser(alias);
         if (existingUser) {
             throw new Error("[bad-request] User with this alias already exists");
         }
 
-        // Hash the password
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Upload image to S3
         const fileName = `${alias}${imageFileExtension}`;
         const imageUrl = await this.imageDAO.putImage(fileName, userImageBytes);
 
-        // Create user in database
         await this.userDAO.putUser(firstName, lastName, alias, hashedPassword, imageUrl);
 
-        // Generate auth token
         const token = AuthToken.Generate();
         await this.authTokenDAO.putAuthToken(token.token, alias, token.timestamp);
 
-        // Return user and token DTOs
         const userDto: UserDto = {
             firstName,
             lastName,

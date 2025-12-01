@@ -32,14 +32,11 @@ export class StatusService implements Service {
         pageSize: number,
         lastItem: StatusDto | null
     ): Promise<[StatusDto[], boolean]> {
-        // Validate auth token
         await this.authHelper.validateAuthToken(authToken);
 
-        // Get feed items from FeedDAO
         const lastTimestamp = lastItem ? lastItem.timestamp : null;
         const result = await this.feedDAO.getPageOfFeedItems(userAlias, pageSize, lastTimestamp);
 
-        // Convert raw status data to StatusDtos with full user info
         const statusDtos = await this.convertToStatusDtos(result.statuses);
 
         return [statusDtos, result.hasMore];
@@ -51,14 +48,11 @@ export class StatusService implements Service {
         pageSize: number,
         lastItem: StatusDto | null
     ): Promise<[StatusDto[], boolean]> {
-        // Validate auth token
         await this.authHelper.validateAuthToken(authToken);
 
-        // Get story items from StatusDAO
         const lastTimestamp = lastItem ? lastItem.timestamp : null;
         const result = await this.statusDAO.getPageOfStatuses(userAlias, pageSize, lastTimestamp);
 
-        // Convert raw status data to StatusDtos with full user info
         const statusDtos = await this.convertToStatusDtos(result.statuses);
 
         return [statusDtos, result.hasMore];
@@ -68,21 +62,16 @@ export class StatusService implements Service {
         authToken: string,
         newStatus: StatusDto
     ): Promise<void> {
-        // Validate auth token and get current user alias
         const currentUserAlias = await this.authHelper.validateAuthToken(authToken);
 
-        // Verify the status is being posted by the authenticated user
         if (newStatus.user.alias !== currentUserAlias) {
             throw new Error("[unauthorized] Cannot post status for another user");
         }
 
-        // Store the status in StatusDAO (for user's story)
         await this.statusDAO.putStatus(newStatus.post, newStatus.user.alias, newStatus.timestamp);
 
-        // Get all followers to distribute the status to their feeds
         const followerAliases = await this.getAllFollowerAliases(currentUserAlias);
 
-        // Add status to all followers' feeds
         if (followerAliases.length > 0) {
             await this.feedDAO.batchPutFeedItems(
                 followerAliases,
@@ -93,9 +82,6 @@ export class StatusService implements Service {
         }
     }
 
-    /**
-     * Gets all follower aliases for a user (for feed distribution).
-     */
     private async getAllFollowerAliases(userAlias: string): Promise<string[]> {
         const allFollowers: string[] = [];
         let hasMore = true;
@@ -113,9 +99,6 @@ export class StatusService implements Service {
         return allFollowers;
     }
 
-    /**
-     * Converts raw status data to StatusDto objects with full user information.
-     */
     private async convertToStatusDtos(
         statuses: Array<{ post: string; authorAlias: string; timestamp: number }>
     ): Promise<StatusDto[]> {
@@ -125,7 +108,6 @@ export class StatusService implements Service {
                 throw new Error(`User not found: ${status.authorAlias}`);
             }
 
-            // Create User and Status objects to parse segments
             const userObj = new User(
                 user.firstName,
                 user.lastName,
@@ -134,7 +116,6 @@ export class StatusService implements Service {
             );
             const statusObj = new Status(status.post, userObj, status.timestamp);
 
-            // Return the DTO with parsed segments
             return statusObj.dto;
         });
 

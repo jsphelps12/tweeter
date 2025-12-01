@@ -16,14 +16,6 @@ export class UserNavHooksPresenter extends Presenter<UserNavView> {
         this.userService = new UserService();
     }
 
-
-    // public async getUser (
-    //     authToken: AuthToken,
-    //     alias: string
-    //     ): Promise<User | null> {
-    //     return this.userService.getUser(authToken, alias);
-    //     };
-
     public extractAlias (value: string): string {
         const index = value.indexOf("@");
         return value.substring(index);
@@ -43,22 +35,6 @@ export class UserNavHooksPresenter extends Presenter<UserNavView> {
             }
         }, "navigate to user");
 
-        // try {
-        // const alias = this.extractAlias(event);
-
-        // const toUser = await this.getUser(authToken, alias);
-
-        // if (toUser) {
-        //     if (!toUser.equals(displayedUser!)) {
-        //     this.view.setDisplayedUser(toUser);
-        //     this.view.navigate(`${featurePath}/${toUser.alias}`);
-        //     }
-        // }
-        // } catch (error) {
-        // this.view.displayErrorMessage(
-        //     `Failed to get user because of exception: ${error}`
-        // );
-        // }
     };
 
 

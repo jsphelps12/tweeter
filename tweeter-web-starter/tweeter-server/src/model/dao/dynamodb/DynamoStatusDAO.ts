@@ -41,7 +41,7 @@ export class DynamoStatusDAO implements StatusDAO {
                 ":author": authorAlias,
             },
             Limit: pageSize,
-            ScanIndexForward: false, // Sort descending (newest first)
+            ScanIndexForward: false, 
         };
 
         if (lastStatusTimestamp) {

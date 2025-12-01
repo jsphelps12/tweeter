@@ -7,9 +7,7 @@ export interface MessageView extends View {
     deleteMessage: (messageId: string) => void;
 }
 
-//parent presenter
 export abstract class Presenter<V extends View> {
-    // Common functionality for all presenters can be added here
     private _view: V;
 
     protected constructor(view: V){

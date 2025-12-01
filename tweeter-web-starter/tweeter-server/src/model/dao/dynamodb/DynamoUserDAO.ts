@@ -107,7 +107,7 @@ export class DynamoUserDAO implements UserDAO {
         }
 
         if (updateExpressions.length === 0) {
-            return; // Nothing to update
+            return;
         }
 
         const params = {

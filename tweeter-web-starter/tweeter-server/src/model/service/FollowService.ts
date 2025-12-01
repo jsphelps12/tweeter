@@ -26,14 +26,11 @@ export class FollowService implements Service {
         pageSize: number,
         lastItem: UserDto | null
     ): Promise<[UserDto[], boolean]> {
-        // Validate auth token
         await this.authHelper.validateAuthToken(authToken);
 
-        // Get followee aliases from FollowDAO
         const lastFolloweeAlias = lastItem ? lastItem.alias : null;
         const result = await this.followDAO.getPageOfFollowees(userAlias, pageSize, lastFolloweeAlias);
 
-        // Convert aliases to UserDtos
         const userDtos = await this.getUsersFromAliases(result.aliases);
 
         return [userDtos, result.hasMore];
@@ -45,14 +42,11 @@ export class FollowService implements Service {
         pageSize: number,
         lastItem: UserDto | null
     ): Promise<[UserDto[], boolean]> {
-        // Validate auth token
         await this.authHelper.validateAuthToken(authToken);
 
-        // Get follower aliases from FollowDAO
         const lastFollowerAlias = lastItem ? lastItem.alias : null;
         const result = await this.followDAO.getPageOfFollowers(userAlias, pageSize, lastFollowerAlias);
 
-        // Convert aliases to UserDtos
         const userDtos = await this.getUsersFromAliases(result.aliases);
 
         return [userDtos, result.hasMore];
@@ -62,10 +56,8 @@ export class FollowService implements Service {
         authToken: string,
         user: UserDto
     ): Promise<number> {
-        // Validate auth token
         await this.authHelper.validateAuthToken(authToken);
 
-        // Get all followees and count them
         let count = 0;
         let hasMore = true;
         let lastAlias: string | null = null;
@@ -86,10 +78,8 @@ export class FollowService implements Service {
         authToken: string,
         user: UserDto
     ): Promise<number> {
-        // Validate auth token
         await this.authHelper.validateAuthToken(authToken);
 
-        // Get all followers and count them
         let count = 0;
         let hasMore = true;
         let lastAlias: string | null = null;
@@ -111,10 +101,8 @@ export class FollowService implements Service {
         user: UserDto,
         selectedUser: UserDto
     ): Promise<boolean> {
-        // Validate auth token
         await this.authHelper.validateAuthToken(authToken);
 
-        // Check if follow relationship exists
         const follow = await this.followDAO.getFollow(user.alias, selectedUser.alias);
         return follow !== null;
     }
@@ -123,13 +111,10 @@ export class FollowService implements Service {
         authToken: string,
         userToFollow: UserDto
     ): Promise<[followerCount: number, followeeCount: number]> {
-        // Validate auth token and get current user's alias
         const currentUserAlias = await this.authHelper.validateAuthToken(authToken);
 
-        // Create follow relationship
         await this.followDAO.putFollow(currentUserAlias, userToFollow.alias);
 
-        // Get updated counts for the user being followed
         const followerCount = await this.getFollowerCount(authToken, userToFollow);
         const followeeCount = await this.getFolloweeCount(authToken, userToFollow);
 
@@ -140,27 +125,20 @@ export class FollowService implements Service {
         authToken: string,
         userToUnfollow: UserDto
     ): Promise<[followerCount: number, followeeCount: number]> {
-        // Validate auth token and get current user's alias
         const currentUserAlias = await this.authHelper.validateAuthToken(authToken);
 
-        // Delete follow relationship
         await this.followDAO.deleteFollow(currentUserAlias, userToUnfollow.alias);
 
-        // Get updated counts for the user being unfollowed
         const followerCount = await this.getFollowerCount(authToken, userToUnfollow);
         const followeeCount = await this.getFolloweeCount(authToken, userToUnfollow);
 
         return [followerCount, followeeCount];
     }
 
-    /**
-     * Converts an array of aliases to UserDto objects.
-     */
     private async getUsersFromAliases(aliases: string[]): Promise<UserDto[]> {
         const userPromises = aliases.map(alias => this.userDAO.getUser(alias));
         const users = await Promise.all(userPromises);
 
-        // Filter out nulls and convert to UserDto
         return users
             .filter(user => user !== null)
             .map(user => ({

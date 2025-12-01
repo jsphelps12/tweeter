@@ -77,12 +77,10 @@ export class Status {
       let startIndex = post.indexOf(url, previousStartIndex);
 
       if (startIndex > -1) {
-        // Push the url
         references.push(
           new PostSegment(url, startIndex, startIndex + url.length, Type.url)
         );
 
-        // Move start and previous start past the url
         startIndex = startIndex + url.length;
         previousStartIndex = startIndex;
       }
@@ -125,7 +123,6 @@ export class Status {
     } else {
       index = word.length;
 
-      // Remove trailing non-alphabetic characters (such as punctuation) that can't be at the end of a url
       while (!Status.isLetter(word[index])) {
         index--;
       }
@@ -149,7 +146,6 @@ export class Status {
       let startIndex = post.indexOf(mention, previousStartIndex);
 
       if (startIndex > -1) {
-        // Push the alias
         references.push(
           new PostSegment(
             mention,
@@ -159,7 +155,6 @@ export class Status {
           )
         );
 
-        // Move start and previous start past the mention
         startIndex = startIndex + mention.length;
         previousStartIndex = startIndex;
       }
@@ -173,7 +168,6 @@ export class Status {
 
     for (let word of post.split(/(\s+)/)) {
       if (word.startsWith("@")) {
-        // Remove all non-alphanumeric characters
         word.replaceAll(/[^a-zA-Z0-9]/g, "");
 
         mentions.push(word);
@@ -262,7 +256,6 @@ export class Status {
       User.fromDto(dto.user)!,
       dto.timestamp
     );
-    // Override the auto-generated segments with the ones from the DTO
     status._segments = dto.segments.map(segDto => PostSegment.fromDto(segDto));
     return status;
   }

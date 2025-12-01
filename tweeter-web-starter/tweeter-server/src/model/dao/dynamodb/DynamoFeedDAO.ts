@@ -37,7 +37,6 @@ export class DynamoFeedDAO implements FeedDAO {
         authorAlias: string,
         timestamp: number
     ): Promise<void> {
-        // DynamoDB BatchWrite can handle max 25 items at a time
         const batchSize = 25;
 
         for (let i = 0; i < recipientAliases.length; i += batchSize) {
@@ -76,7 +75,7 @@ export class DynamoFeedDAO implements FeedDAO {
                 ":recipient": recipientAlias,
             },
             Limit: pageSize,
-            ScanIndexForward: false, // Sort descending (newest first)
+            ScanIndexForward: false, 
         };
 
         if (lastStatusTimestamp) {

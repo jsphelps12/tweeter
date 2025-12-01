@@ -12,9 +12,6 @@ import { DynamoStatusDAO } from "./DynamoStatusDAO";
 import { DynamoUserDAO } from "./DynamoUserDAO";
 import { S3ImageDAO } from "./S3ImageDAO";
 
-/**
- * Concrete factory for creating DynamoDB DAO instances.
- */
 export class DynamoDAOFactory extends DAOFactory {
     createUserDAO(): UserDAO {
         return new DynamoUserDAO();

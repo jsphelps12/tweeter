@@ -19,22 +19,12 @@ export abstract class AuthenticatorPresenter<T extends AuthenticatorView> extend
         super(view);
     }
 
-    // public async doAuthAction (...args: any[]): Promise<void> {
-    //     await this.doFailureReportingOperation(async () => {
-    //         const [user, authToken] = await this.performAuth(...args);
-
-    //         this.view.updateUserInfo(user, user, authToken, rememberMe);
-
-    //         this.doNav(user, args[args.length - 1]); // originalUrl is the last argument
-    //     }, this.itemDescription());
-    // };
     public async doAuthAction(rememberMe: boolean, originalUrl?: string): Promise<void> {
         await this.doFailureReportingOperation(async () => {
         this.view.setIsLoading(true);
 
         const [user, authToken] = await this.performAuth();
 
-        // common post-success behavior
         this.view.updateUserInfo(user, user, authToken, rememberMe);
 
         if (originalUrl && originalUrl.length > 0) {
@@ -43,7 +33,6 @@ export abstract class AuthenticatorPresenter<T extends AuthenticatorView> extend
             this.view.navigate(`/feed/${user.alias}`);
         }
         }, "authenticate user").finally(() => {
-        // ensure loading cleared regardless of success/error
         this.view.setIsLoading(false);
         });
     }

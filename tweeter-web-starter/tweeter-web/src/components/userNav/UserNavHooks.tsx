@@ -26,22 +26,6 @@ export const useUserNavigation = (featurePath: string) => {
 
     presenterRef.current!.navigateToUser(event.target.toString(), authToken!, displayedUser!, featurePath);
 
-    // try {
-    //   const alias = presenterRef.current!.extractAlias(event.target.toString());
-
-    //   const toUser = await presenterRef.current!.getUser(authToken!, alias);
-
-    //   if (toUser) {
-    //     if (!toUser.equals(displayedUser!)) {
-    //       setDisplayedUser(toUser);
-    //       navigate(`${featurePath}/${toUser.alias}`);
-    //     }
-    //   }
-    // } catch (error) {
-    //   displayErrorMessage(
-    //     `Failed to get user because of exception: ${error}`
-    //   );
-    // }
   };
   return navigateToUser;
 }
