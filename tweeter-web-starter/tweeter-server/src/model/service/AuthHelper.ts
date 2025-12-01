@@ -21,7 +21,7 @@ export class AuthHelper {
         const authToken = await this.authTokenDAO.getAuthToken(token);
 
         if (!authToken) {
-            throw new Error("[Unauthorized] Invalid or expired authentication token");
+            throw new Error("[unauthorized] Invalid or expired authentication token");
         }
 
         // Check if token is expired (15 minutes of inactivity)
@@ -31,7 +31,7 @@ export class AuthHelper {
 
         if (tokenAge > fifteenMinutes) {
             await this.authTokenDAO.deleteAuthToken(token);
-            throw new Error("[Unauthorized] Authentication token has expired");
+            throw new Error("[unauthorized] Authentication token has expired");
         }
 
         // Update token timestamp for activity tracking

@@ -61,18 +61,18 @@ export class UserService implements Service {
         // Get user from database
         const user = await this.userDAO.getUser(alias);
         if (!user) {
-            throw new Error("[BadRequest] Invalid alias or password");
+            throw new Error("[bad-request] Invalid alias or password");
         }
 
         // Get and verify password hash
         const passwordHash = await this.userDAO.getPasswordHash(alias);
         if (!passwordHash) {
-            throw new Error("[BadRequest] Invalid alias or password");
+            throw new Error("[bad-request] Invalid alias or password");
         }
 
         const isValidPassword = await bcrypt.compare(password, passwordHash);
         if (!isValidPassword) {
-            throw new Error("[BadRequest] Invalid alias or password");
+            throw new Error("[bad-request] Invalid alias or password");
         }
 
         // Generate auth token
@@ -119,7 +119,7 @@ export class UserService implements Service {
         // Check if user already exists
         const existingUser = await this.userDAO.getUser(alias);
         if (existingUser) {
-            throw new Error("[BadRequest] User with this alias already exists");
+            throw new Error("[bad-request] User with this alias already exists");
         }
 
         // Hash the password

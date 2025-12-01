@@ -75,12 +75,18 @@ Resources:
             statusCode: 400
             responseParameters: *commonCorsHeaders
             responseTemplates:
-              application/json: '{ "error": "$input.path(''$.errorMessage'')" }'
+              application/json: |
+                #set($message = $input.path('$.errorMessage'))
+                #set($cleanMessage = $message.replace('[bad-request] ', ''))
+                { "error": "$cleanMessage" }
           ".*unauthorized.*":
             statusCode: 401
             responseParameters: *commonCorsHeaders
             responseTemplates:
-              application/json: '{ "error": "$input.path(''$.errorMessage'')" }'
+              application/json: |
+                #set($message = $input.path('$.errorMessage'))
+                #set($cleanMessage = $message.replace('[unauthorized] ', ''))
+                { "error": "$cleanMessage" }
           ".*internal-server-error.*":
             statusCode: 500
             responseParameters: *commonCorsHeaders

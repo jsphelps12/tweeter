@@ -73,7 +73,7 @@ export class StatusService implements Service {
 
         // Verify the status is being posted by the authenticated user
         if (newStatus.user.alias !== currentUserAlias) {
-            throw new Error("[Unauthorized] Cannot post status for another user");
+            throw new Error("[unauthorized] Cannot post status for another user");
         }
 
         // Store the status in StatusDAO (for user's story)
