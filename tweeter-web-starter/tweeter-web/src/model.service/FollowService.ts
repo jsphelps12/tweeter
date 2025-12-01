@@ -91,6 +91,6 @@ export class FollowService implements Service{
           token: authToken.token,
           userToFollow: userToUnfollow.dto
         };
-        return this.serverFacade.follow(request);
+        return this.serverFacade.unfollow(request);
     };
 }

@@ -34,7 +34,7 @@ const statusItem = (props: Props) => {
                     to={`${props.featurePath}/${props.status.user.alias}`}
                     onClick={navigateToUser}
                   >
-                    {props.status.user.alias}
+                    @{props.status.user.alias}
                   </Link>
                 </h2>
                 {props.status.formattedDate}
