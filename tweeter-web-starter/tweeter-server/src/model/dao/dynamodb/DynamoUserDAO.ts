@@ -32,6 +32,8 @@ export class DynamoUserDAO implements UserDAO {
                 lastName: lastName,
                 hashedPassword: hashedPassword,
                 imageUrl: imageUrl,
+                followerCount: 0,
+                followeeCount: 0,
             },
         };
 
@@ -132,5 +134,69 @@ export class DynamoUserDAO implements UserDAO {
         };
 
         await this.client.send(new DeleteCommand(params));
+    }
+
+    async getFollowerCount(alias: string): Promise<number> {
+        const result = await this.client.send(new GetCommand({
+            TableName: this.tableName,
+            Key: { alias },
+            ProjectionExpression: "followerCount",
+        }));
+
+        return result.Item?.followerCount ?? 0;
+    }
+
+    async getFolloweeCount(alias: string): Promise<number> {
+        const result = await this.client.send(new GetCommand({
+            TableName: this.tableName,
+            Key: { alias },
+            ProjectionExpression: "followeeCount",
+        }));
+
+        return result.Item?.followeeCount ?? 0;
+    }
+
+    async incrementFollowerCount(alias: string): Promise<void> {
+        await this.client.send(new UpdateCommand({
+            TableName: this.tableName,
+            Key: { alias },
+            UpdateExpression: "ADD followerCount :inc",
+            ExpressionAttributeValues: {
+                ":inc": 1,
+            },
+        }));
+    }
+
+    async decrementFollowerCount(alias: string): Promise<void> {
+        await this.client.send(new UpdateCommand({
+            TableName: this.tableName,
+            Key: { alias },
+            UpdateExpression: "ADD followerCount :dec",
+            ExpressionAttributeValues: {
+                ":dec": -1,
+            },
+        }));
+    }
+
+    async incrementFolloweeCount(alias: string): Promise<void> {
+        await this.client.send(new UpdateCommand({
+            TableName: this.tableName,
+            Key: { alias },
+            UpdateExpression: "ADD followeeCount :inc",
+            ExpressionAttributeValues: {
+                ":inc": 1,
+            },
+        }));
+    }
+
+    async decrementFolloweeCount(alias: string): Promise<void> {
+        await this.client.send(new UpdateCommand({
+            TableName: this.tableName,
+            Key: { alias },
+            UpdateExpression: "ADD followeeCount :dec",
+            ExpressionAttributeValues: {
+                ":dec": -1,
+            },
+        }));
     }
 }

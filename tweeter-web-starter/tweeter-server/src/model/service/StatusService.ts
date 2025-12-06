@@ -7,6 +7,7 @@ import { FollowDAO } from "../dao/interface/FollowDAO";
 import { UserDAO } from "../dao/interface/UserDAO";
 import { AuthTokenDAO } from "../dao/interface/AuthTokenDAO";
 import { AuthHelper } from "./AuthHelper";
+import { SQSClient } from "../util/SQSClient";
 
 export class StatusService implements Service {
     private statusDAO: StatusDAO;
@@ -68,18 +69,18 @@ export class StatusService implements Service {
             throw new Error("[unauthorized] Cannot post status for another user");
         }
 
+        // Write to author's story
         await this.statusDAO.putStatus(newStatus.post, newStatus.user.alias, newStatus.timestamp);
 
-        const followerAliases = await this.getAllFollowerAliases(currentUserAlias);
-
-        if (followerAliases.length > 0) {
-            await this.feedDAO.batchPutFeedItems(
-                followerAliases,
-                newStatus.post,
-                newStatus.user.alias,
-                newStatus.timestamp
-            );
-        }
+        // Send to PostQueue for async feed processing
+        const sqsClient = new SQSClient();
+        const postQueueUrl = process.env.POST_QUEUE_URL!;
+        
+        await sqsClient.sendMessage(postQueueUrl, {
+            authorAlias: newStatus.user.alias,
+            post: newStatus.post,
+            timestamp: newStatus.timestamp,
+        });
     }
 
     private async getAllFollowerAliases(userAlias: string): Promise<string[]> {

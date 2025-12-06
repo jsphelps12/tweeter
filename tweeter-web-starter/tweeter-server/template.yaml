@@ -444,6 +444,9 @@ Resources:
       FunctionName: PostStatusFunction
       Handler: lambda/status/PostStatusLambda.handler
       Policies: *commonPolicies
+      Environment:
+        Variables:
+          POST_QUEUE_URL: !Ref PostQueue
       Events:
         PostApi:
           Type: Api
@@ -507,6 +510,40 @@ Resources:
             RestApiId: !Ref tweeterApi
             Path: /user/logout
             Method: POST
+
+
+  #
+  # SQS-Triggered Lambda Functions
+  #
+
+  FollowFetcherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: FollowFetcherFunction
+      Handler: lambda/sqs/FollowFetcherLambda.handler
+      Policies: *commonPolicies
+      Timeout: 300
+      Environment:
+        Variables:
+          JOB_QUEUE_URL: !Ref JobQueue
+      Events:
+        PostQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt PostQueue.Arn
+
+  JobHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: JobHandlerFunction
+      Handler: lambda/sqs/JobHandlerLambda.handler
+      Policies: *commonPolicies
+      Timeout: 180
+      Events:
+        JobQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt JobQueue.Arn
 
 
   #
@@ -611,6 +648,41 @@ Resources:
       OwnershipControls:
         Rules:
           - ObjectOwnership: ObjectWriter
+
+
+  #
+  # SQS Queues
+  #
+
+  PostQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: PostQueue
+      VisibilityTimeout: 300
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt PostQueueDLQ.Arn
+        maxReceiveCount: 3
+
+  PostQueueDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: PostQueueDLQ
+      MessageRetentionPeriod: 1209600  # 14 days
+
+  JobQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: JobQueue
+      VisibilityTimeout: 180
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt JobQueueDLQ.Arn
+        maxReceiveCount: 3
+
+  JobQueueDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: JobQueueDLQ
+      MessageRetentionPeriod: 1209600  # 14 days
 
 
 Outputs:

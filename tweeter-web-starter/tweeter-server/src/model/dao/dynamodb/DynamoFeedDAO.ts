@@ -41,25 +41,49 @@ export class DynamoFeedDAO implements FeedDAO {
 
         for (let i = 0; i < recipientAliases.length; i += batchSize) {
             const batch = recipientAliases.slice(i, i + batchSize);
+            let unprocessedAliases = batch;
+            let attempts = 0;
+            const maxAttempts = 3;
 
-            const putRequests = batch.map((recipientAlias) => ({
-                PutRequest: {
-                    Item: {
-                        recipient_alias: recipientAlias,
-                        timestamp: timestamp,
-                        author_alias: authorAlias,
-                        post: post,
+            while (unprocessedAliases.length > 0 && attempts < maxAttempts) {
+                const putRequests = unprocessedAliases.map((recipientAlias) => ({
+                    PutRequest: {
+                        Item: {
+                            recipient_alias: recipientAlias,
+                            timestamp: timestamp,
+                            author_alias: authorAlias,
+                            post: post,
+                        },
                     },
-                },
-            }));
+                }));
 
-            const params = {
-                RequestItems: {
-                    [this.tableName]: putRequests,
-                },
-            };
+                const params = {
+                    RequestItems: {
+                        [this.tableName]: putRequests,
+                    },
+                };
 
-            await this.client.send(new BatchWriteCommand(params));
+                const result = await this.client.send(new BatchWriteCommand(params));
+
+                // Extract unprocessed items to retry
+                const unprocessedItems = result.UnprocessedItems?.[this.tableName] || [];
+                unprocessedAliases = unprocessedItems
+                    .map((req) => req.PutRequest?.Item?.recipient_alias)
+                    .filter((alias): alias is string => !!alias);
+
+                attempts++;
+
+                if (unprocessedAliases.length > 0 && attempts < maxAttempts) {
+                    // Exponential backoff: 100ms, 200ms, 400ms
+                    await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, attempts - 1)));
+                }
+            }
+
+            if (unprocessedAliases.length > 0) {
+                throw new Error(
+                    `Failed to write ${unprocessedAliases.length} feed items after ${maxAttempts} attempts`
+                );
+            }
         }
     }
 

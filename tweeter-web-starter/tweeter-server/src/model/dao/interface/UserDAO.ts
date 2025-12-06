@@ -19,4 +19,16 @@ export interface UserDAO {
     ): Promise<void>;
 
     deleteUser(alias: string): Promise<void>;
+
+    getFollowerCount(alias: string): Promise<number>;
+
+    getFolloweeCount(alias: string): Promise<number>;
+
+    incrementFollowerCount(alias: string): Promise<void>;
+
+    decrementFollowerCount(alias: string): Promise<void>;
+
+    incrementFolloweeCount(alias: string): Promise<void>;
+
+    decrementFolloweeCount(alias: string): Promise<void>;
 }

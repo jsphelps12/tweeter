@@ -13,7 +13,6 @@ export const handler = async (request: PostStatusRequest): Promise<PostStatusRes
 
     return {
         success: true,
-        message: null  
-
-    }
+        message: null
+    };
 };

@@ -57,21 +57,7 @@ export class FollowService implements Service {
         user: UserDto
     ): Promise<number> {
         await this.authHelper.validateAuthToken(authToken);
-
-        let count = 0;
-        let hasMore = true;
-        let lastAlias: string | null = null;
-
-        while (hasMore) {
-            const result = await this.followDAO.getPageOfFollowees(user.alias, 100, lastAlias);
-            count += result.aliases.length;
-            hasMore = result.hasMore;
-            if (result.aliases.length > 0) {
-                lastAlias = result.aliases[result.aliases.length - 1];
-            }
-        }
-
-        return count;
+        return await this.userDAO.getFolloweeCount(user.alias);
     }
 
     public async getFollowerCount(
@@ -79,21 +65,7 @@ export class FollowService implements Service {
         user: UserDto
     ): Promise<number> {
         await this.authHelper.validateAuthToken(authToken);
-
-        let count = 0;
-        let hasMore = true;
-        let lastAlias: string | null = null;
-
-        while (hasMore) {
-            const result = await this.followDAO.getPageOfFollowers(user.alias, 100, lastAlias);
-            count += result.aliases.length;
-            hasMore = result.hasMore;
-            if (result.aliases.length > 0) {
-                lastAlias = result.aliases[result.aliases.length - 1];
-            }
-        }
-
-        return count;
+        return await this.userDAO.getFollowerCount(user.alias);
     }
 
     public async getIsFollowerStatus(
@@ -115,6 +87,12 @@ export class FollowService implements Service {
 
         await this.followDAO.putFollow(currentUserAlias, userToFollow.alias);
 
+        // Update counts: current user's followee count increases, target user's follower count increases
+        await Promise.all([
+            this.userDAO.incrementFolloweeCount(currentUserAlias),
+            this.userDAO.incrementFollowerCount(userToFollow.alias)
+        ]);
+
         const followerCount = await this.getFollowerCount(authToken, userToFollow);
         const followeeCount = await this.getFolloweeCount(authToken, userToFollow);
 
@@ -128,6 +106,12 @@ export class FollowService implements Service {
         const currentUserAlias = await this.authHelper.validateAuthToken(authToken);
 
         await this.followDAO.deleteFollow(currentUserAlias, userToUnfollow.alias);
+
+        // Update counts: current user's followee count decreases, target user's follower count decreases
+        await Promise.all([
+            this.userDAO.decrementFolloweeCount(currentUserAlias),
+            this.userDAO.decrementFollowerCount(userToUnfollow.alias)
+        ]);
 
         const followerCount = await this.getFollowerCount(authToken, userToUnfollow);
         const followeeCount = await this.getFolloweeCount(authToken, userToUnfollow);

@@ -24,7 +24,10 @@ export const useUserNavigation = (featurePath: string) => {
   const navigateToUser = async (event: React.MouseEvent): Promise<void> => {
     event.preventDefault();
 
-    presenterRef.current!.navigateToUser(event.target.toString(), authToken!, displayedUser!, featurePath);
+    const target = event.target as HTMLElement;
+    const alias = target.textContent || "";
+    
+    presenterRef.current!.navigateToUser(alias, authToken!, displayedUser!, featurePath);
 
   };
   return navigateToUser;
