@@ -16,24 +16,17 @@ describe("Post Status Integration Test", () => {
     let mockView: PostStatusView;
     const timestamp = Date.now();
     const testPost = `Integration test post at ${timestamp}`;
-    const testUserAlias = `testuser${timestamp}`;
 
     beforeAll(async () => {
         serverFacade = new ServerFacade();
         
-        // Step 1: Register a new test user
-        const imageStringBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
-        
-        const [registeredUser, token] = await serverFacade.register({
-            firstName: "Test",
-            lastName: "User",
-            alias: testUserAlias,
-            password: "password",
-            userImageBytes: imageStringBase64,
-            imageFileExtension: "png"
+        // Step 1: Login a user
+        const [loggedInUser, token] = await serverFacade.login({
+            alias: "user1",
+            password: "user1"
         });
 
-        user = registeredUser;
+        user = loggedInUser;
         authToken = token;
 
         // Setup mock view for presenter
