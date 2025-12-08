@@ -1,19 +1,15 @@
 import { StatusDAO } from "../interface/StatusDAO";
 import {
-    DynamoDBDocumentClient,
     PutCommand,
-    QueryCommand,
     DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoBaseDAO } from "./DynamoBaseDAO";
 
-export class DynamoStatusDAO implements StatusDAO {
+export class DynamoStatusDAO extends DynamoBaseDAO implements StatusDAO {
     private readonly tableName = "tweeter-statuses";
-    private readonly client: DynamoDBDocumentClient;
 
     constructor() {
-        const dynamoClient = new DynamoDBClient({ region: "us-east-1" });
-        this.client = DynamoDBDocumentClient.from(dynamoClient);
+        super();
     }
 
     async putStatus(post: string, authorAlias: string, timestamp: number): Promise<void> {
@@ -34,35 +30,21 @@ export class DynamoStatusDAO implements StatusDAO {
         pageSize: number,
         lastStatusTimestamp: number | null
     ): Promise<{ statuses: Array<{ post: string; authorAlias: string; timestamp: number }>; hasMore: boolean }> {
-        const params: any = {
-            TableName: this.tableName,
-            KeyConditionExpression: "author_alias = :author",
-            ExpressionAttributeValues: {
-                ":author": authorAlias,
-            },
-            Limit: pageSize,
-            ScanIndexForward: false, 
-        };
-
-        if (lastStatusTimestamp) {
-            params.ExclusiveStartKey = {
-                author_alias: authorAlias,
-                timestamp: lastStatusTimestamp,
-            };
-        }
-
-        const result = await this.client.send(new QueryCommand(params));
-
-        const statuses =
-            result.Items?.map((item) => ({
+        const { items, hasMore } = await this.queryPaginatedByPartitionKey(
+            this.tableName,
+            "author_alias",
+            authorAlias,
+            "timestamp",
+            pageSize,
+            lastStatusTimestamp,
+            (item) => ({
                 post: item.post,
                 authorAlias: item.author_alias,
                 timestamp: item.timestamp,
-            })) || [];
+            })
+        );
 
-        const hasMore = !!result.LastEvaluatedKey;
-
-        return { statuses, hasMore };
+        return { statuses: items, hasMore };
     }
 
     async deleteStatus(authorAlias: string, timestamp: number): Promise<void> {

@@ -69,10 +69,8 @@ export class StatusService implements Service {
             throw new Error("[unauthorized] Cannot post status for another user");
         }
 
-        // Write to author's story
         await this.statusDAO.putStatus(newStatus.post, newStatus.user.alias, newStatus.timestamp);
 
-        // Send to PostQueue for async feed processing
         const sqsClient = new SQSClient();
         const postQueueUrl = process.env.POST_QUEUE_URL!;
         

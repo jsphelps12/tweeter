@@ -20,15 +20,12 @@ export const handler = async (event: SQSEvent): Promise<void> => {
     for (const record of event.Records) {
         const message: PostQueueMessage = JSON.parse(record.body);
 
-        // Get all followers
         const followerAliases = await getAllFollowerAliases(message.authorAlias, followDAO);
 
-        // Chunk followers into batches of 25 (DynamoDB batch write limit)
         const batchSize = 25;
         for (let i = 0; i < followerAliases.length; i += batchSize) {
             const batch = followerAliases.slice(i, i + batchSize);
 
-            // Send batch to JobQueue
             await sqsClient.sendMessage(jobQueueUrl, {
                 followerAliases: batch,
                 authorAlias: message.authorAlias,

@@ -18,7 +18,6 @@ export const handler = async (event: SQSEvent): Promise<void> => {
     for (const record of event.Records) {
         const message: JobQueueMessage = JSON.parse(record.body);
 
-        // Write to all followers' feeds in this batch
         await feedDAO.batchPutFeedItems(
             message.followerAliases,
             message.post,

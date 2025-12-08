@@ -87,7 +87,6 @@ export class FollowService implements Service {
 
         await this.followDAO.putFollow(currentUserAlias, userToFollow.alias);
 
-        // Update counts: current user's followee count increases, target user's follower count increases
         await Promise.all([
             this.userDAO.incrementFolloweeCount(currentUserAlias),
             this.userDAO.incrementFollowerCount(userToFollow.alias)
@@ -107,7 +106,6 @@ export class FollowService implements Service {
 
         await this.followDAO.deleteFollow(currentUserAlias, userToUnfollow.alias);
 
-        // Update counts: current user's followee count decreases, target user's follower count decreases
         await Promise.all([
             this.userDAO.decrementFolloweeCount(currentUserAlias),
             this.userDAO.decrementFollowerCount(userToUnfollow.alias)
